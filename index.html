@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITCON Camp 2025 Sample Frontend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-todo-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-row > div {
+            flex: 1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #5a67d8, #667eea);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(90, 103, 216, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .btn-edit:hover {
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+        }
+
+        .btn-delete:hover {
+            box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .btn-load {
+            background: linear-gradient(135deg, #38b2ac, #319795);
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .btn-load:hover {
+            box-shadow: 0 10px 20px rgba(56, 178, 172, 0.3);
+        }
+
+        .todos-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .todo-item {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-item.completed {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+        }
+
+        .todo-item.completed .todo-title {
+            text-decoration: line-through;
+            color: #68d391;
+        }
+
+        .todo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .todo-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .priority-1 { background: #fed7d7; color: #c53030; }
+        .priority-2 { background: #feebc8; color: #dd6b20; }
+        .priority-3 { background: #fefcbf; color: #d69e2e; }
+        .priority-4 { background: #c6f6d5; color: #38a169; }
+        .priority-5 { background: #bee3f8; color: #3182ce; }
+
+        .todo-description {
+            color: #718096;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .completed-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #38a169;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 18px;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #5a67d8;
+            font-size: 16px;
+            padding: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .todo-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .btn-small {
+                width: 100%;
+                margin: 2px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SITCON Camp 2025 Todo App</h1>
+        
+        <div class="add-todo-section">
+            <h2 style="margin-bottom: 20px; color: #4a5568;">新增待辦事項</h2>
+            
+            <div class="form-group">
+                <label for="todo-title">標題</label>
+                <input type="text" id="todo-title" placeholder="輸入待辦事項標題" />
+            </div>
+            
+            <div class="form-group">
+                <label for="todo-description">描述</label>
+                <textarea id="todo-description" placeholder="輸入詳細描述（選填）"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="todo-priority">優先度 (1-5)</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <select id="todo-priority" style="width: 30%;">
+                            <option value="5">5 - 最高優先度</option>
+                            <option value="4">4 - 高優先度</option>
+                            <option value="3" selected>3 - 中等優先度</option>
+                            <option value="2">2 - 低優先度</option>
+                            <option value="1">1 - 最低優先度</option>
+                        </select>
+                        <button class="btn" onclick="createTodo()">新增待辦事項</button>
+                    </div>
+            </div>
+        </div>
+        
+        <div class="todos-section">
+            <button class="btn btn-load" onclick="getData()">重新載入待辦事項</button>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000";
+        
+        window.onload = function() {
+            getData();
+        };
+        
+        async function getData() {
+            try {
+                document.getElementById("result").innerHTML = '<div class="loading">載入中...</div>';
+                const response = await fetch(`${API_URL}/todos`);
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    document.getElementById("result").innerHTML = '<div class="empty-state">目前沒有待辦事項，快新增一個吧！</div>';
+                    return;
+                }
+                
+                let html = "";
+                data.forEach((todo, index) => {
+                    html += `
+                        <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                            ${todo.completed ? '<div class="completed-badge">✓</div>' : ''}
+                            <div class="todo-header">
+                                <h3 class="todo-title">${escapeHtml(todo.title)}</h3>
+                                <span class="priority-badge priority-${todo.priority}">優先度 ${todo.priority}</span>
+                            </div>
+                            ${todo.description ? `<div class="todo-description">${escapeHtml(todo.description)}</div>` : ''}
+                            <div class="todo-actions">
+                                <button class="btn btn-small btn-edit" onclick="toggleComplete(${index}, ${todo.completed})">
+                                    ${todo.completed ? '取消完成' : '標記完成'}
+                                </button>
+                                <button class="btn btn-small btn-edit" onclick="editTodo(${index})">編輯</button>
+                                <button class="btn btn-small btn-delete" onclick="deleteTodo(${index})">刪除</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById("result").innerHTML = html;
+            } catch (error) {
+                document.getElementById("result").innerHTML = '<div class="empty-state">載入失敗，請檢查後端服務是否運行</div>';
+                console.error('Error fetching todos:', error);
+            }
+        }
+        
+        async function createTodo() {
+            const title = document.getElementById("todo-title").value.trim();
+            const description = document.getElementById("todo-description").value.trim();
+            const priority = parseInt(document.getElementById("todo-priority").value);
+            
+            if (!title) {
+                alert("請輸入標題");
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/todos`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: description,
+                        completed: false,
+                        priority: priority
+                    }),
+                });
+                
+                if (response.ok) {
+                    document.getElementById("todo-title").value = "";
+                    document.getElementById("todo-description").value = "";
+                    document.getElementById("todo-priority").value = "3";
+                    
+                    await getData();
+                } else {
+                    alert("新增失敗，請稍後再試");
+                }
+            } catch (error) {
+                alert("新增失敗，請檢查網路連線");
+                console.error('Error creating todo:', error);
+            }
+        }
+        
+        async function editTodo(index) {
+            try {
+                const response = await fetch(`${API_URL}/todo/${index}`);
+                const todo = await response.json();
+                
+                const newTitle = prompt("編輯標題:", todo.title);
+                if (newTitle === null) return;
+                
+                const newDescription = prompt("編輯描述:", todo.description || "");
+                if (newDescription === null) return;
+                
+                const newPriority = prompt("編輯優先度 (1-5):", todo.priority);
+                if (newPriority === null) return;
+                
+                const priority = parseInt(newPriority);
+                if (isNaN(priority) || priority < 1 || priority > 5) {
+                    alert("優先度必須是 1 到 5 之間的數字");
+                    return;
+                }
+                
+                const updateResponse = await fetch(`${API_URL}/todo/${index}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        title: newTitle.trim(),
+                        description: newDescription.trim(),
+                        completed: todo.completed,
+                        priority: priority
+                    }),
+                });
+                
+                if (updateResponse.ok) {
+                    await getData();
+                } else {
+                    alert("更新失敗，請稍後再試");
+                }
+            } catch (error) {
+                alert("更新失敗，請檢查網路連線");
+                console.error('Error updating todo:', error);
+            }
+        }
+        
+        async function toggleComplete(index, currentStatus) {
+            try {
+                const response = await fetch(`${API_URL}/todo/${index}`);
+                const todo = await response.json();
+                
+                const updateResponse = await fetch(`${API_URL}/todo/${index}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        title: todo.title,
+                        description: todo.description,
+                        completed: !currentStatus,
+                        priority: todo.priority
+                    }),
+                });
+                
+                if (updateResponse.ok) {
+                    await getData();
+                } else {
+                    alert("更新狀態失敗，請稍後再試");
+                }
+            } catch (error) {
+                alert("更新狀態失敗，請檢查網路連線");
+                console.error('Error toggling todo:', error);
+            }
+        }
+        
+        async function deleteTodo(index) {
+            if (confirm("確定要刪除這個待辦事項嗎？")) {
+                try {
+                    const response = await fetch(`${API_URL}/todo/${index}`, {
+                        method: "DELETE",
+                    });
+                    
+                    if (response.ok) {
+                        await getData();
+                    } else {
+                        alert("刪除失敗，請稍後再試");
+                    }
+                } catch (error) {
+                    alert("刪除失敗，請檢查網路連線");
+                    console.error('Error deleting todo:', error);
+                }
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
